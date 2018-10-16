@@ -1,5 +1,6 @@
 type: update
 name: MongoDB Auto-Cluster
+id: mongodb-auto-cluster-logic
 logo: images/mongodb-70x70.png
 
 baseUrl: https://raw.githubusercontent.com/dzotic9/mongo-replic/master/
