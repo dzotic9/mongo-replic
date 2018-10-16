@@ -9,6 +9,7 @@ globals:
 
 nodeGroupAlias:
   ${targetNodes.nodeGroup}: nosqldb
+
 onInstall:
   script: |
     resp = jelastic.env.control.GetContainerEnvVars('${env.envName}', session, ${nodes.nosqldb.first.id})
@@ -19,13 +20,13 @@ actions:
   setupReplica:
     install:
       jps: ${globals.logic_jps}
-        envName: ${env.envName}
-        nodeGroup: sqldb
-        settings:
-          path: ${baseUrl}
-          scheme: "${this.scheme}",
-          logic_jps: ${globals.logic_jps}
-          db_user: jelastic-${fn.random}
-          db_pass: ${fn.password(20)}
-          repl_user: repl-${fn.random}
-          repl_pass: ${fn.password(20)}
+      envName: ${env.envName}
+      nodeGroup: sqldb
+      settings:
+        path: ${baseUrl}
+        scheme: ${this.scheme}
+        logic_jps: ${globals.logic_jps}
+        db_user: jelastic-${fn.random}
+        db_pass: ${fn.password(20)}
+        repl_user: repl-${fn.random}
+        repl_pass: ${fn.password(20)}
