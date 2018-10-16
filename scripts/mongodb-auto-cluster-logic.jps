@@ -10,13 +10,17 @@ globals:
   REPL_SET_NAME: rs${fn.random}
   MONGO_LOG: "/var/log/mongo-replic-install.log"
 
-onInstall:
-  - if (!nodes.arb && nodes.nosqldb.length > 1):
-    addNodes:
-    - nodeType: mongodb
-      nodeGroup: arb
-      displayName: Arbiter
-      cloudlets: 4
+onInstall: setupCluster
+onAfterScaleOut[nosqldb]: setupCluster
+      
+actions:
+  setupCluster:
+    - if (!nodes.arb && nodes.nosqldb.length > 1):
+      addNodes:
+        - nodeType: mongodb
+          nodeGroup: arb
+          displayName: Arbiter
+          cloudlets: 4
   - cmd [arb]:
     - mkdir ${globals.ARBITER_PATH} && chown mongod:mongod ${globals.ARBITER_PATH};
       sed -i "s|dbPath:.*|dbPath: ${globals.ARBITER_PATH}|g" /etc/mongod.conf
