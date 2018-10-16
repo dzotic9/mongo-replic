@@ -10,7 +10,7 @@ globals:
   MONGO_LOG: "/var/log/mongo-replic-install.log"
 
 onInstall:
-  - if (!nodes.arb):
+  - if (!nodes.arb && nodes.nosqldb.length > 1):
     addNodes:
     - nodeType: mongodb
       nodeGroup: arb
