@@ -1,0 +1,31 @@
+type: update
+name: MongoDB Auto-Cluster
+id: mongodb-auto-cluster
+
+baseUrl: https://raw.githubusercontent.com/dzotic9/mongo-replic/master/
+
+globals:
+  logic_jps: ${baseUrl}scripts/mongodb-auto-cluster-logic.jps
+
+nodeGroupAlias:
+  ${targetNodes.nodeGroup}: nosqldb
+onInstall:
+  script: |
+    resp = jelastic.env.control.GetContainerEnvVars('${env.envName}', session, ${nodes.nosqldb.first.id})
+    if (resp.result != 0) return resp
+    if ((resp.object.AUTO_CLUSTER + '').toLowerCase() == 'false') return {result:0}
+    return {result:0, onAfterReturn: setupReplica}
+actions:
+  setupReplica:
+    install:
+      jps: ${globals.logic_jps}
+        envName: ${env.envName}
+        nodeGroup: sqldb
+        settings:
+          path: ${baseUrl}
+          scheme: "${this.scheme}",
+          logic_jps: ${globals.logic_jps}
+          db_user: jelastic-${fn.random}
+          db_pass: ${fn.password(20)}
+          repl_user: repl-${fn.random}
+          repl_pass: ${fn.password(20)}
