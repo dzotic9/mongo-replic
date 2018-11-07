@@ -13,7 +13,7 @@ for (i = 0, n = oNodes.length; i < n; i += 1) {
   if (oNodes[i].nodeGroup == nosqldbNodeGroup) {
       jelastic.marketplace.console.WriteLog(oNodes[i].id);
 	  
-      if (!nMasterNodeId && oNodes[i].ismaster == "true") {
+      if (!nMasterNodeId && oNodes[i].ismaster == true) {
 	nMasterNodeId = oNodes[i].id;
       }
       if (isPrimary(oNodes[i].id)) {
