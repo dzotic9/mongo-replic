@@ -3,9 +3,6 @@ name: Scaling
 
 baseUrl: https://raw.githubusercontent.com/dzotic9/mongo-replic/master/
 
-globals:
-  MONGO_LOG: /var/log/mongo-replic-install.log
-
 targetNodes:
   nodeGroup: nosqldb
 
@@ -19,6 +16,17 @@ onAfterScaleOut [nosqldb]:
   nosqldbNodeGroup: nosqldb
   next: scaleoutNodes
 
+globals:
+  ARBITER_PATH: /var/lib/mongo/arb
+  REPL_SET_NAME: rs${fn.random}
+  MONGO_LOG: "/var/log/mongodb/mongo-replic-install.log"
+
+onInstall:
+  script: https://raw.githubusercontent.com/dzotic9/mongo-replic/master/scripts/checkPrimaryNode.js?_r=${fn.random}
+  next: scaleoutNodes
+  init: configureClusterNodes
+  nosqldbNodeGroup: nosqldb
+
 actions:
   scaleIn:
     script: ${baseUrl}scripts/scaleIn.js?_r=${fn.random}
@@ -26,13 +34,32 @@ actions:
     nodeGroup: nosqldb
 
   scaleoutNodes:
-  - forEach (event.response.nodes):
-    - cmd [${@i.id}]:
-      - 'sed -i "s|#replication:|replication:\n  replSetName: ${settings.REPL_SET_NAME}|g" /etc/mongod.conf;
-        sed -i "s|authorization: enabled|authorization: disabled|g" /etc/mongod.conf'
-      user: root
-    - restartNodes [${@i.id}]
+  - forEach (nodes.nosqldb):
     - script: ${baseUrl}scripts/configureScaling.js?_r=${fn.random}
       newNodeIp: ${@i.address}
       nodeGroup: nosqldb
       masterNodeId: ${this.masterNodeId}
+      
+  configureClusterNodes:
+  - forEach (nodes.nosqldb):
+    - cmd [${@i.id}]:
+      - 'sed -i "s|#replication:|replication:\n  replSetName: ${globals.REPL_SET_NAME}|g" /etc/mongod.conf;
+        sed -i "s|authorization: enabled|authorization: disabled|g" /etc/mongod.conf'
+      user: root
+    - restartNodes [${@i.id}]
+    - initiateReplica
+      
+  initiateReplica:
+  - if (!nodes.arb):
+      addNodes:
+      - nodeType: mongodb
+        nodeGroup: arb
+        displayName: Arbiter
+        cloudlets: 4
+  - cmd [${nodes.nosqldb.master.id}]:
+    - bash /tmp/replicaSet.sh --exec=initiate --master=${nodes.nosqldb.master.address} --first=${nodes.nosqldb[0].address} --second=${nodes.nosqldb[1].address} --arbitr=${nodes.arb.address} --priority=1 --replSet=${globals.REPL_SET_NAME} 2>&1 1>>${globals.MONGO_LOG}
+    - curl "${baseUrl}scripts/replicaSet.sh?_r=${fn.random}" -o /tmp/replicaSet.sh 2>&1 1>>${globals.MONGO_LOG}
+    user: root
+  - install [nosqldb]: ${baseUrl}add-ons/scaling.jps?_r=${fn.random}
+    settings:
+      REPL_SET_NAME: ${globals.REPL_SET_NAME}
