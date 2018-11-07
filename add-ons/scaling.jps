@@ -22,7 +22,7 @@ globals:
   MONGO_LOG: "/var/log/mongodb/mongo-replic-install.log"
 
 onInstall:
-  if (nodes.sqldb.length >1):
+  if (nodes.nosqldb.length >1):
     script: https://raw.githubusercontent.com/dzotic9/mongo-replic/master/scripts/checkPrimaryNode.js?_r=${fn.random}
     next: scaleoutNodes
     init: configureClusterNodes
