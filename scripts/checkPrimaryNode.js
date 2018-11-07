@@ -40,7 +40,7 @@ if (!bMasterSevice) {
     onAfterReturn: []
   };
 
-  obj = {}; obj[init] = {masterNodeId: nMasterNodeId}
+  obj = {}; obj[initCluster] = {masterNodeId: nMasterNodeId}
   oResp.onAfterReturn.push(obj);
 
   return oResp;
