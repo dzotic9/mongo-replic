@@ -58,6 +58,13 @@ actions:
         nodeGroup: arb
         displayName: Arbiter
         cloudlets: 4
+  - cmd [arb]:
+    - 'mkdir ${globals.ARBITER_PATH} && chown mongod:mongod ${globals.ARBITER_PATH};
+      sed -i "s|dbPath:.*|dbPath: ${globals.ARBITER_PATH}|g" /etc/mongod.conf
+      sed -i "s|#replication:|replication:\n  replSetName: ${globals.REPL_SET_NAME}|g" /etc/mongod.conf;
+      sed -i "s|authorization: enabled|authorization: disabled|g" /etc/mongod.conf'
+    user: root
+  - restartNodes [arb]
   - cmd [${nodes.nosqldb.master.id}]:
     - bash /tmp/replicaSet.sh --exec=initiate --master=${nodes.nosqldb.master.address} --first=${nodes.nosqldb[0].address} --second=${nodes.nosqldb[1].address} --arbitr=${nodes.arb.address} --priority=1 --replSet=${globals.REPL_SET_NAME} 2>&1 1>>${globals.MONGO_LOG}
     - curl "${baseUrl}scripts/replicaSet.sh?_r=${fn.random}" -o /tmp/replicaSet.sh 2>&1 1>>${globals.MONGO_LOG}
