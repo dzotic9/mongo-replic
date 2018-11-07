@@ -25,7 +25,7 @@ onInstall:
   if (nodes.nosqldb.length >1):
     script: https://raw.githubusercontent.com/dzotic9/mongo-replic/master/scripts/checkPrimaryNode.js?_r=${fn.random}
     next: scaleoutNodes
-    init: configureClusterNodes
+    initCluster: configureClusterNodes
     nosqldbNodeGroup: nosqldb
 
 actions:
