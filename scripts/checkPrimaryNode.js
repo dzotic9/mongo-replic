@@ -1,6 +1,7 @@
 //nosqldbNodeGroup
 var sTargetAppid = getParam("TARGET_APPID"),
     oNodes = jelastic.env.control.GetEnvInfo(sTargetAppid, session).nodes,
+    bMasterSevice = false,
     slaveVote = 1,
     obj,
     oResp,
@@ -11,6 +12,7 @@ for (i = 0, n = oNodes.length; i < n; i += 1) {
   if (oNodes[i].nodeGroup == nosqldbNodeGroup) {
       jelastic.marketplace.console.WriteLog(oNodes[i].id);
       if (isPrimary(oNodes[i].id)) {
+      bMasterSevice = true;
 
       jelastic.marketplace.console.WriteLog("isPrimary ->" + oNodes[i].id);
       oResp = {
@@ -22,6 +24,26 @@ for (i = 0, n = oNodes.length; i < n; i += 1) {
       oResp.onAfterReturn.push(obj);
 
       return oResp;
+    }
+  }
+}
+
+if (!bMasterSevice) {
+  for (i = 0, n = oNodes.length; i < n; i += 1) {
+    if (oNodes[i].nodeGroup == nosqldbNodeGroup) {
+      if (oNodes[i].ismaster) {
+
+        jelastic.marketplace.console.WriteLog("isPrimary by master node ->" + oNodes[i].id);
+        oResp = {
+          result: 0,
+          onAfterReturn: []
+        };
+
+        obj = {}; obj[next] = {masterNodeId: oNodes[i].id}
+        oResp.onAfterReturn.push(obj);
+
+        return oResp;
+      }
     }
   }
 }
