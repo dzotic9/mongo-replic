@@ -58,17 +58,17 @@ actions:
       sed -i "s|#replication:|replication:\n  replSetName: ${globals.REPL_SET_NAME}|g" /etc/mongod.conf;
       sed -i "s|authorization: enabled|authorization: disabled|g" /etc/mongod.conf'
     user: root
-    nodeGroup: arb
+    nodeGroup: ${nodes.arb.nodeGroup}
   - restartNodes [arb]
       
   initiateReplica:
   - if (!nodes.arb):
-      addNodes:
+    - addNodes:
       - nodeType: mongodb
         nodeGroup: arb
         displayName: Arbiter
         cloudlets: 4
-  - configureArbiter
+    - configureArbiter
   - cmd [${nodes.nosqldb.master.id}]:
     - bash /tmp/replicaSet.sh --exec=initiate --master=${nodes.nosqldb.master.address} --first=${nodes.nosqldb[0].address} --second=${nodes.nosqldb[1].address} --arbitr=${nodes.arb.address} --priority=1 --replSet=${globals.REPL_SET_NAME} 2>&1 1>>${globals.MONGO_LOG}
     - curl "${baseUrl}scripts/replicaSet.sh?_r=${fn.random}" -o /tmp/replicaSet.sh 2>&1 1>>${globals.MONGO_LOG}
