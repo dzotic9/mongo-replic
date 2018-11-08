@@ -36,7 +36,7 @@ actions:
     nodeGroup: nosqldb
   scaleoutNodes:
   - forEach (event.response.nodes):
-      if (${@i.nodeGroup} == nosqldb):
+      if (${@i.nodeGroup} == "nosqldb"):
         - cmd [${@i.id}]:
           - 'sed -i "s|#replication:|replication:\n  replSetName: ${globals.REPL_SET_NAME}|g"
             /etc/mongod.conf;'
