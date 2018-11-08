@@ -32,8 +32,6 @@ for (var i = 0, n = aReplicaNodes.length; i < n; i += 1) {
     }
 }
 
-jelastic.marketplace.console.WriteLog("aReplicaNodes without arbiter ->" + aReplicaNodes);
-
 aReplicaNodes = aReplicaNodes.filter(function(n){ 
     return n != undefined 
 });
@@ -84,6 +82,8 @@ function reconfigureRespSet() {
 	oResp,
         i,
         n;
+	
+jelastic.marketplace.console.WriteLog("oConfig ->" + oConfig);
     
     oConfig = oConfig.responses[0].out;
     oConfig = oConfig.replace(/NumberLong\(.*\)/g, "\"$&\"");
@@ -92,7 +92,8 @@ function reconfigureRespSet() {
     oConfig = (oConfig.length > 0) ? oConfig[0] : oConfig;
     oConfig = toNative(new JSONObject((oConfig)));
     oConfigMembers = oConfig.members;
-
+	
+jelastic.marketplace.console.WriteLog("oConfigMembers ->" + oConfigMembers);
     for (i = 0, n = oConfigMembers.length; i < n; i += 1) {
         oMember = oConfigMembers[i];
         sMemberHost = oMember.host.replace(':27017', '');
