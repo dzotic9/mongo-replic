@@ -35,12 +35,13 @@ actions:
     masterNodeId: "${this.masterNodeId}"
     nodeGroup: nosqldb
   scaleoutNodes:
-  - forEach (event.response.nodes.nosqldb):
-      cmd [${@i.id}]:
-      - 'sed -i "s|#replication:|replication:\n  replSetName: ${globals.REPL_SET_NAME}|g"
-        /etc/mongod.conf;'
-      - 'sed -i "s|authorization: enabled|authorization: disabled|g" /etc/mongod.conf'
-      user: root
+  - forEach (event.response.nodes):
+      if (${@i.nodeGroup} == nosqldb):
+        - cmd [${@i.id}]:
+          - 'sed -i "s|#replication:|replication:\n  replSetName: ${globals.REPL_SET_NAME}|g"
+            /etc/mongod.conf;'
+          - 'sed -i "s|authorization: enabled|authorization: disabled|g" /etc/mongod.conf'
+          user: root
   - forEach (nodes.nosqldb):
     - script: "${baseUrl}scripts/configureScaling.js?_r=${fn.random}"
       newNodeIp: "${@i.address}"
