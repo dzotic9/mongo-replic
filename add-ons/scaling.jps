@@ -1,34 +1,46 @@
----
 type: update
 name: Scaling
+
 baseUrl: https://raw.githubusercontent.com/dzotic9/mongo-replic/master/
+
 targetNodes:
   nodeGroup: nosqldb
+
 onAfterScaleIn [nosqldb]:
   script: "${baseUrl}scripts/checkPrimaryNode.js?_r=${fn.random}"
   nosqldbNodeGroup: nosqldb
   next: scaleIn
+
 onAfterScaleOut [nosqldb]:
   script: "${baseUrl}scripts/checkPrimaryNode.js?_r=${fn.random}"
   nosqldbNodeGroup: nosqldb
   initCluster: configureClusterNodes
   next: scaleoutNodes
+
 globals:
   ARBITER_PATH: "/var/lib/mongo/arb"
   REPL_SET_NAME: rs${fn.random}
   MONGO_LOG: "/var/log/mongodb/mongo-replic-install.log"
+
 onInstall:
   if (nodes.nosqldb.length >1):
     script: https://raw.githubusercontent.com/dzotic9/mongo-replic/master/scripts/checkPrimaryNode.js?_r=${fn.random}
     next: scaleoutNodes
     initCluster: configureClusterNodes
     nosqldbNodeGroup: nosqldb
+
 actions:
   scaleIn:
     script: "${baseUrl}scripts/scaleIn.js?_r=${fn.random}"
     masterNodeId: "${this.masterNodeId}"
     nodeGroup: nosqldb
   scaleoutNodes:
+  - forEach (event.response.nodes.nosqldb):
+      cmd [${@i.id}]:
+      - 'sed -i "s|#replication:|replication:\n  replSetName: ${globals.REPL_SET_NAME}|g"
+        /etc/mongod.conf;'
+      - 'sed -i "s|authorization: enabled|authorization: disabled|g" /etc/mongod.conf'
+      user: root
   - forEach (nodes.nosqldb):
     - script: "${baseUrl}scripts/configureScaling.js?_r=${fn.random}"
       newNodeIp: "${@i.address}"
@@ -38,8 +50,8 @@ actions:
   - forEach (nodes.nosqldb):
     - cmd [${@i.id}]:
       - 'sed -i "s|#replication:|replication:\n  replSetName: ${globals.REPL_SET_NAME}|g"
-        /etc/mongod.conf; sed -i "s|authorization: enabled|authorization: disabled|g"
-        /etc/mongod.conf'
+        /etc/mongod.conf;'
+      - 'sed -i "s|authorization: enabled|authorization: disabled|g" /etc/mongod.conf'
       user: root
     - restartNodes [${@i.id}]
     - initiateReplica
