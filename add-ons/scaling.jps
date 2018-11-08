@@ -79,6 +79,3 @@ actions:
     - curl "${baseUrl}scripts/replicaSet.sh?_r=${fn.random}" -o /tmp/replicaSet.sh
       2>&1 1>>${globals.MONGO_LOG}
     user: root
-  - install [nosqldb]: "${baseUrl}add-ons/scaling.jps?_r=${fn.random}"
-    settings:
-      REPL_SET_NAME: "${globals.REPL_SET_NAME}"
