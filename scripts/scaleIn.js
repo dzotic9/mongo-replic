@@ -92,7 +92,7 @@ jelastic.marketplace.console.WriteLog("oConfig ->" + oConfig);
 	jelastic.marketplace.console.WriteLog("oConfig2 ->" + oConfig);
     //oConfig = oConfig.match(/{[\s\tA-Za-z\n\w:,.()\[\]{}\\"]+}/g);
 	//{[\\s\\tA-Za-z\\n\w:,.()\[\]{}"\- ]+}
-	   oConfig = oConfig.match(/{[\\\s\\\tA-Za-z\\\n\\w:,.()\\[\\]{}"\- ]+}/g);
+	   oConfig = oConfig.match(/{[\s\tA-Za-z0-9\n\w:,.()\[\]{}\\"\- ]+}/g);
 	jelastic.marketplace.console.WriteLog("oConfig3 ->" + oConfig);
     oConfig = (oConfig.length > 0) ? oConfig[0] : oConfig;
 	jelastic.marketplace.console.WriteLog("oConfig4 ->" + oConfig);
