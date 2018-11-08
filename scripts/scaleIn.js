@@ -33,6 +33,8 @@ for (var i = 0, n = aReplicaNodes.length; i < n; i += 1) {
     }
 }
 
+jelastic.marketplace.console.WriteLog("aReplicaNodes without arbiter ->" + aReplicaNodes);
+
 aReplicaNodes = aReplicaNodes.filter(function(n){ 
     return n != undefined 
 }); 
