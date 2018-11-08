@@ -87,8 +87,11 @@ jelastic.marketplace.console.WriteLog("oConfig ->" + oConfig);
     
     oConfig = oConfig.responses[0].out;
     oConfig = oConfig.replace(/NumberLong\(.*\)/g, "\"$&\"");
+	jelastic.marketplace.console.WriteLog("oConfig1 ->" + oConfig);
     oConfig = oConfig.replace(/(ObjectId\()(\")([A-Za-z0-9]+)(\")(\))/, '\"$1\\\$23$3\\\$4$5"');
+	jelastic.marketplace.console.WriteLog("oConfig2 ->" + oConfig);
     oConfig = oConfig.match(/{[\s\tA-Za-z\n\w:,.()\[\]{}\\"]+}/g);
+	jelastic.marketplace.console.WriteLog("oConfig3 ->" + oConfig);
     oConfig = (oConfig.length > 0) ? oConfig[0] : oConfig;
 	jelastic.marketplace.console.WriteLog("oConfig4 ->" + oConfig);
     oConfig = toNative(new JSONObject((oConfig)));
