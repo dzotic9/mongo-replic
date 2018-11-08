@@ -20,6 +20,7 @@ for (var i = 0, n = aNodes.length; i < n; i += 1) {
 }
 
 aReplicaNodes = getReplicaAddresses();
+jelastic.marketplace.console.WriteLog("aReplicaNodes ->" + aReplicaNodes);
 
 for (var i = 0, n = aReplicaNodes.length; i < n; i += 1) {
 
@@ -40,7 +41,8 @@ for (var i = 0, n = aReplicaNodes.length; i < n; i += 1) {
     var oResp;
 
     oResp = removeSlave(masterNodeId, aReplicaNodes[i]);
-
+    jelastic.marketplace.console.WriteLog("removeSlave oResp ->" + aReplicaNodes[i] + "-" + oResp);
+	
     if (oResp.reconfigured) {
     	return oResp;
     }
@@ -58,7 +60,7 @@ function removeSlave(masterId, ip) {
     
     if (!isPrimary(masterId)) {
 	oResp = reconfigureRespSet();
-	    
+	jelastic.marketplace.console.WriteLog("reconfigureRespSet oResp ->" + oResp);
         return {
 	    result : 0,
 	    reconfigured: true,
