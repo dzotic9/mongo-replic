@@ -1,44 +1,11 @@
 type: install
-name: MongoDB Database Replication
-logo: images/mongodb-70x70.png
 
-baseUrl: https://raw.githubusercontent.com/dzotic9/mongo-replic/master/
+name: MongoDB Database Replica Set
+
+logo: images/mongodb-70x70.png
 
 nodes:
   - nodeType: mongodb
-    displayName: replSet
-    count: 2
     cloudlets: 8
-  - nodeType: mongodb
-    nodeGroup: arb
-    displayName: Arbiter
-    cloudlets: 4
-
-globals:
-  ARBITER_PATH: /var/lib/mongo/arb
-  REPL_SET_NAME: rs${fn.random}
-  MONGO_LOG: "/var/log/mongo-replic-install.log"
-
-onInstall:
-  - cmd [arb]:
-    - 'mkdir ${globals.ARBITER_PATH} && chown mongod:mongod ${globals.ARBITER_PATH};
-      sed -i "s|dbPath:.*|dbPath: ${globals.ARBITER_PATH}|g" /etc/mongod.conf'
-    user: root
-
-  - cmd [*]:
-    - 'sed -i "s|#replication:|replication:\n  replSetName: ${globals.REPL_SET_NAME}|g" /etc/mongod.conf;
-      sed -i "s|authorization: enabled|authorization: disabled|g" /etc/mongod.conf'
-    user: root
-
-  - restartNodes [nosqldb]    
-  - restartNodes [arb]
-
-  - cmd [${nodes.nosqldb.master.id}]:
-    - curl "${baseUrl}scripts/replicaSet.sh?_r=${fn.random}" -o /tmp/replicaSet.sh
-      >>${globals.MONGO_LOG}
-    - bash -x /tmp/replicaSet.sh --exec=initiate --master=${nodes.nosqldb.master.address} --first=${nodes.nosqldb[0].address} --second=${nodes.nosqldb[1].address} --arbitr=${nodes.arb.address} --priority=1 --replSet=${globals.REPL_SET_NAME} >> ${globals.MONGO_LOG}
-  - install [nosqldb]: ${baseUrl}add-ons/scaling.jps?_r=${fn.random}
-    settings:
-      REPL_SET_NAME: ${globals.REPL_SET_NAME}
-
-startPage: ${nodes.nosqldb[0].url}
+    env:
+      ON_ENV_INSTALL: https://raw.githubusercontent.com/dzotic9/mongo-replic/master/add-ons/scaling.jps
