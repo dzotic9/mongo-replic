@@ -11,7 +11,6 @@ var sTargetAppid = getParam("TARGET_APPID"),
 
 for (i = 0, n = oNodes.length; i < n; i += 1) {
   if (oNodes[i].nodeGroup == nosqldbNodeGroup) {
-      jelastic.marketplace.console.WriteLog(oNodes[i].id);
 	  
       if (!nMasterNodeId && oNodes[i].ismaster == true) {
 	nMasterNodeId = oNodes[i].id;
@@ -19,7 +18,6 @@ for (i = 0, n = oNodes.length; i < n; i += 1) {
       if (isPrimary(oNodes[i].id)) {
       bMasterSevice = true;
 
-      jelastic.marketplace.console.WriteLog("isPrimary ->" + oNodes[i].id);
       oResp = {
         result: 0,
         onAfterReturn: []
@@ -34,7 +32,6 @@ for (i = 0, n = oNodes.length; i < n; i += 1) {
 }
 
 if (!bMasterSevice) {
-  jelastic.marketplace.console.WriteLog("isPrimary by master node ->" + nMasterNodeId);
   oResp = {
     result: 0,
     onAfterReturn: []
@@ -61,7 +58,7 @@ function isPrimary(nodeId) {
     ];
 
     oResp = exec(nodeId, cmd);
-    jelastic.marketplace.console.WriteLog("oResp exec ->" + oResp);
+
     if (!oResp || oResp.result != 0){
         return oResp;
     }
@@ -74,7 +71,6 @@ function isPrimary(nodeId) {
 	}
     }
 
-    jelastic.marketplace.console.WriteLog("aCmdResp ->" + aCmdResp);
     if (aCmdResp[0] == "true" && aCmdResp[1] == "false") {
         return true;
     }
