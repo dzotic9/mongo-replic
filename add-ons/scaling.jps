@@ -24,14 +24,14 @@ globals:
 
 onInstall:
   if (nodes.nosqldb.length >1):
-    script: https://raw.githubusercontent.com/dzotic9/mongo-replic/master/scripts/checkPrimaryNode.js?_r=${fn.random}
+    script: ${baseUrl}scripts/checkPrimaryNode.js?_r=${fn.random}
     next: scaleoutNodes
     initCluster: configureClusterNodes
     nosqldbNodeGroup: nosqldb
 
 actions:
   scaleIn:
-    script: "${baseUrl}scripts/scaleIn.js?_r=${fn.random}"
+    script: ${baseUrl}scripts/scaleIn.js?_r=${fn.random}
     masterNodeId: "${this.masterNodeId}"
     nodeGroup: nosqldb
   scaleoutNodes:
