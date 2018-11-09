@@ -42,6 +42,7 @@ actions:
             /etc/mongod.conf;'
           - 'sed -i "s|authorization: enabled|authorization: disabled|g" /etc/mongod.conf'
           user: root
+        - restartNodes [${@i.id}]
   - forEach (nodes.nosqldb):
     - script: "${baseUrl}scripts/configureScaling.js?_r=${fn.random}"
       newNodeIp: "${@i.address}"
