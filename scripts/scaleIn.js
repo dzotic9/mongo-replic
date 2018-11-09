@@ -36,13 +36,10 @@ aReplicaNodes = aReplicaNodes.filter(function(n){
     return n != undefined 
 });
 
-jelastic.marketplace.console.WriteLog("aReplicaNodes filtered ->" + aReplicaNodes);
-
 for (var i = 0, n = aReplicaNodes.length; i < n; i += 1) {
     var oResp;
 
     oResp = removeSlave(masterNodeId, aReplicaNodes[i]);
-    jelastic.marketplace.console.WriteLog("removeSlave oResp ->" + aReplicaNodes[i] + "-" + oResp);
 	
     if (oResp.reconfigured) {
     	return oResp;
@@ -61,11 +58,11 @@ function removeSlave(masterId, ip) {
     
     if (!isPrimary(masterId)) {
 	oResp = reconfigureRespSet();
-	jelastic.marketplace.console.WriteLog("reconfigureRespSet oResp ->" + oResp);
-        return {
-	    result : 0,
-	    reconfigured: true,
-	    response: oResp
+
+	return {
+	  result : 0,
+	  reconfigured: true,
+	  response: oResp
 	}
     }
     
@@ -83,24 +80,15 @@ function reconfigureRespSet() {
         i,
         n;
 	
-jelastic.marketplace.console.WriteLog("oConfig ->" + oConfig);
     
     oConfig = oConfig.responses[0].out;
     oConfig = oConfig.replace(/NumberLong\(.*\)/g, "\"$&\"");
-	jelastic.marketplace.console.WriteLog("oConfig1 ->" + oConfig);
     oConfig = oConfig.replace(/(ObjectId\()(\")([A-Za-z0-9]+)(\")(\))/, '\"$1\\\$23$3\\\$4$5"');
-	jelastic.marketplace.console.WriteLog("oConfig2 ->" + oConfig);
-    //oConfig = oConfig.match(/{[\s\tA-Za-z\n\w:,.()\[\]{}\\"]+}/g);
-	//{[\\s\\tA-Za-z\\n\w:,.()\[\]{}"\- ]+}
-	   oConfig = oConfig.match(/{[\s\tA-Za-z0-9\n\w:,.()\[\]{}\\"\- ]+}/g);
-	jelastic.marketplace.console.WriteLog("oConfig3 ->" + oConfig);
+    oConfig = oConfig.match(/{[\s\tA-Za-z0-9\n\w:,.()\[\]{}\\"\- ]+}/g);
     oConfig = (oConfig.length > 0) ? oConfig[0] : oConfig;
-	jelastic.marketplace.console.WriteLog("oConfig4 ->" + oConfig);
     oConfig = toNative(new JSONObject((oConfig)));
-	jelastic.marketplace.console.WriteLog("toNative ->" + oConfig);
     oConfigMembers = oConfig.members;
 	
-jelastic.marketplace.console.WriteLog("oConfigMembers ->" + oConfigMembers);
     for (i = 0, n = oConfigMembers.length; i < n; i += 1) {
         oMember = oConfigMembers[i];
         sMemberHost = oMember.host.replace(':27017', '');
